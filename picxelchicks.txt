@@ -1,0 +1,56 @@
+
+import ibmiotf.application
+import ibmiotf.device
+import sys
+from cloudant.client import Cloudant
+from cloudant.error import CloudantException 
+from cloudant.result import Result, ResultByKey
+#Provide your IBM Watson Device Credentials
+import time
+
+organization = "1gn1jz"
+deviceType = "abcd"
+deviceId = "1100"
+authMethod = "token"
+authToken = "P(WWiF?stWik4h5FzB"
+
+try:
+	deviceOptions = {"org": organization, "type": deviceType, "id": deviceId, "auth-method": authMethod, "auth-token": authToken}
+	deviceCli = ibmiotf.device.Client(deviceOptions)
+	#..............................................
+	
+except Exception as e:
+	print("Caught exception connecting device: %s" % str(e))
+	sys.exit()
+
+deviceCli.connect()
+    
+
+client = Cloudant("65f86065-364f-485f-b807-d79248668031-bluemix", "b1d007d7c9fe25d3b3db9c222dc6b6d84d28102242f86f5a9021284a43612b2e", url="https://65f86065-364f-485f-b807-d79248668031-bluemix:b1d007d7c9fe25d3b3db9c222dc6b6d84d28102242f86f5a9021284a43612b2e@65f86065-364f-485f-b807-d79248668031-bluemix.cloudantnosqldb.appdomain.cloud")
+client.connect()
+database_name = "doorbell"
+while True:
+        l='true'
+        w=100
+        j=45
+        data = {"d":{ 'leakage' : l, 'weight': w, 'jar': j}}
+
+        my_database = client.create_database(database_name)              
+        if my_database.exists():
+            print("'{database_name}' successfully created.")
+            json_document = data
+            new_document = my_database.create_document(json_document)
+            if new_document.exists():        
+                print("Document '{new_document}' successfully created.")
+
+
+
+        def myOnPublishCallback():
+            print ("Published data to IBM Watson")
+
+        success = deviceCli.publishEvent("Data", "json", data, qos=0, on_publish=myOnPublishCallback)
+
+        if not success:
+            print("Not connected to IoTF")
+        time.sleep(10)
+deviceCli.disconnect()

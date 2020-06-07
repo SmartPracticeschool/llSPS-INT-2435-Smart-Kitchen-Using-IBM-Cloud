@@ -1,0 +1,1 @@
+[{"id":"691d509f.44ca6","type":"function","z":"5c0afed3.4ae11","name":"leakage","func":"global.set('leakage',msg.payload.d.leakage);\nreturn {payload:msg.payload.d.leakage};","outputs":1,"noerr":0,"x":240,"y":60,"wires":[["c86f9918.31c558","f666b110.972d4"]]}]
